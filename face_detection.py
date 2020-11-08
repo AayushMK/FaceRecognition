@@ -2,9 +2,6 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-lisa_img = cv2.imread("./data/lisa.jpg", 0)
-chelis_img = cv2.imread("./data/chelis.jpg")
-
 face_cascade = cv2.CascadeClassifier(
     "./data/haarcascade_frontalface_default.xml")
 
@@ -22,9 +19,12 @@ def detect_face(img):
     return face_img
 
 
-result = detect_face(chelis_img)
+lisa_img = cv2.imread("./data/lisa.jpg", 0)
+chelis_img = cv2.imread("./data/chelis.jpg")
 
-plt.imshow(result, cmap="gray")
+result = detect_face(lisa_img)
+
+plt.imshow(result)
 plt.show()
 
 cap = cv2.VideoCapture(0)

@@ -37,36 +37,46 @@
 #   via the command:
 #       pip install numpy
 
-import sys
+
 import cv2
 import dlib
+import matplotlib.pyplot as plt
 
 detector = dlib.get_frontal_face_detector()
-win = dlib.image_window()
-
-
-lisa_img = cv2.imread("./data/lisa.jpg")
-
-chelis_img = cv2.imread("./data/chelis.jpg")
-img = cv2.cvtColor(chelis_img, cv2.COLOR_BGR2RGB)
-
-# chelis_img = dlib.load_rgb_image("./data/chelis.jpg")
 
 
 def detect_face(img):
+    face_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     dets = detector(img, 1)
     print("Number of faces detected: {}".format(len(dets)))
 
     for i, d in enumerate(dets):
-        print("Detection {}: Left: {} Top: {} Right: {} Bottom: {}".format(
-            i, d.left(), d.top(), d.right(), d.bottom()))
-
-    win.clear_overlay()
-    win.set_image(img)
-    win.add_overlay(dets)
-    dlib.hit_enter_to_continue()
-
-    return dets
+        # print("Detection {}: Left: {} Top: {} Right: {} Bottom: {}".format(
+        #     i, d.left(), d.top(), d.right(), d.bottom()))
+        start = (d.left(), d.top())
+        end = (d.right(), d.bottom())
+        color = (255, 255, 255)
+        cv2.rectangle(img, start, end, color, 10)
+    return img
 
 
-detect_face(img)
+lisa_img = cv2.imread("./data/lisa.jpg")
+chelis_img = cv2.imread("./data/chelis.jpg")
+
+result = detect_face(chelis_img)
+
+plt.imshow(result)
+plt.show()
+
+cap = cv2.VideoCapture(0)
+
+while True:
+    rect, frame = cap.read(0)
+    f = detect_face(frame)
+    cv2.imshow('Video Face Detect', f)
+    k = cv2.waitKey(1)
+    if k == 27:
+        break
+
+cap.release()
+cv2.destroyAllWindows()
