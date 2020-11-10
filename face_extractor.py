@@ -67,8 +67,8 @@ def detect_faces(img, name):
     plt.show()
 
 
-img = cv2.cvtColor(cv2.imread("./data/lisa.jpg"), cv2.COLOR_BGR2RGB)
-detect_faces(img, "lisa")
+img = cv2.cvtColor(cv2.imread("./data/david.jpg"), cv2.COLOR_BGR2RGB)
+detect_faces(img, "david")
 
 
 # The detector outputs the following data

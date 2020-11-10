@@ -19,7 +19,7 @@ def detect_face(img):
     return face_img
 
 
-lisa_img = cv2.imread("./data/lisa.jpg", 0)
+lisa_img = cv2.imread("./data/lisa.jpg")
 chelis_img = cv2.imread("./data/chelis.jpg")
 
 result = detect_face(lisa_img)
@@ -31,7 +31,7 @@ cap = cv2.VideoCapture(0)
 
 while True:
     rect, frame = cap.read(0)
-    frame = detect_face(frame)
+    frame = detect_face(cv2.flip(frame, 1))
     cv2.imshow('Video Face Detect', frame)
     k = cv2.waitKey(1)
     if k == 27:

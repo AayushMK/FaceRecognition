@@ -8,8 +8,7 @@ detector = dlib.get_frontal_face_detector()
 
 def detect_face(img):
     face_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    dets = detector(img, 1)
-    print("Number of faces detected: {}".format(len(dets)))
+    dets = detector(face_img, 1)
 
     for i, d in enumerate(dets):
         # print("Detection {}: Left: {} Top: {} Right: {} Bottom: {}".format(
@@ -33,7 +32,7 @@ cap = cv2.VideoCapture(0)
 
 while True:
     rect, frame = cap.read(0)
-    f = detect_face(frame)
+    f = detect_face(cv2.flip(frame, 1))
     cv2.imshow('Video Face Detect', f)
     k = cv2.waitKey(1)
     if k == 27:
