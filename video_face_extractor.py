@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-import random
+
 
 detector = MTCNN()
 
@@ -19,14 +19,13 @@ def getAngle(p1, p2):
     return angle
 
 
-
-
 def detect_faces(img):
-    faces = detector.detect_faces(img)
+
+    faces = detector.detect_faces(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     img_for_crop = img.copy()
     all_faces = []
-    full_bgr_img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    if len(faces) > 0: 
+    full_bgr_img = img.copy()
+    if len(faces) > 0:
         for x in faces:
             start = (x['box'][0], x['box'][1])
             end = (x['box'][0]+x['box'][2], x['box'][1] + x['box'][3])
@@ -61,45 +60,40 @@ def detect_faces(img):
             print(crop)
             if crop.size is not 0:
                 # convert to bgr to save in right format
-                bgr_img = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
-                all_faces.append(bgr_img)
+                # bgr_img = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
+                all_faces.append(crop)
 
-   
     else:
-        font = cv2.FONT_HERSHEY_SIMPLEX 
-        cv2.putText(full_bgr_img, 'No face detected',  (50, 50),  font, 1, (0, 255, 255),  2,  cv2.LINE_4) 
-    return [all_faces,full_bgr_img]
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(full_bgr_img, 'No face detected',  (50, 50),
+                    font, 1, (0, 255, 255),  2,  cv2.LINE_4)
+    return [all_faces, full_bgr_img]
 
 
+if __name__ == '__main__':
 
+    cap = cv2.VideoCapture(0)
 
+    while True:
+        rect, frame = cap.read(0)
+        # my_frame = cv2.resize(frame,None, fx=0.50, fy=0.5)
+        my_frame = cv2.flip(frame, 1)
+        f = detect_faces(my_frame)
 
-cap = cv2.VideoCapture(0)
+        cv2.imshow("Full video", f[1])
 
-while True:
-    rect, frame = cap.read(0)
-    # my_frame = cv2.resize(frame,None, fx=0.50, fy=0.5)
-    my_frame = cv2.flip(frame, 1)
-    f = detect_faces(cv2.cvtColor(my_frame,cv2.COLOR_BGR2RGB))
-    
-    cv2.imshow("Full video",f[1])
+        # append faces
+        if len(f[0]) > 0:
+            faces = []
+            for face in f[0]:
+                faces.append(cv2.resize(face, (200, 280),
+                                        interpolation=cv2.INTER_AREA))
+            all_faces = np.hstack(faces)
+            cv2.imshow("Faces", all_faces)
 
-    #append faces
-    if len(f[0]) > 0:
-        faces = []
-        for face in f[0]:
-            faces.append(cv2.resize(face,(200,280),interpolation=cv2.INTER_AREA))
-        all_faces = np.hstack(faces)
-        cv2.imshow("Faces",all_faces)
+        k = cv2.waitKey(1)
+        if k == 27:
+            break
 
-
-
-    k = cv2.waitKey(1)
-    if k == 27:
-        break
-
-cap.release()
-cv2.destroyAllWindows()
-
-
-
+    cap.release()
+    cv2.destroyAllWindows()
