@@ -19,7 +19,9 @@ def show_image(file):
         e_faces = np.hstack(faces)
         cv2.imshow("Faces", e_faces)
 
-    cv2.imshow("My img", full_bgr_img)
+    # cv2.imshow("My img", full_bgr_img)
+    plt.imshow(cv2.cvtColor(full_bgr_img, cv2.COLOR_BGR2RGB))
+    plt.show()
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
