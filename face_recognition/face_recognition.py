@@ -48,7 +48,6 @@ class FaceRecognition:
             img_shape = self.shape_predictor(img, img_detect[0])
             
             img_chip = dlib.get_face_chip(img, img_shape)
-            print(img_chip.shape)
             img_features = np.array(self.model.compute_face_descriptor(img_chip))
             encoding_list.append(img_features)
         self.encoding_known_list = encoding_list
