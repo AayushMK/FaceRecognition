@@ -48,6 +48,7 @@ class FaceRecognition:
             img_shape = self.shape_predictor(img, img_detect[0])
             
             img_chip = dlib.get_face_chip(img, img_shape)
+            print(img_chip.shape)
             img_features = np.array(self.model.compute_face_descriptor(img_chip))
             encoding_list.append(img_features)
         self.encoding_known_list = encoding_list
@@ -66,14 +67,13 @@ class FaceRecognition:
             top = d.top()
             bottom = d.bottom()
             cf_loacations.append(d)
-            print(left)
+        
             img_shape = self.shape_predictor(img_small, d)
             img_chip = dlib.get_face_chip(img_small, img_shape)
             img_features = np.array(self.model.compute_face_descriptor(img_chip))
             cf_encoding.append(img_features)
         
         rescale_factor = 1/scale_factor
-        print(rescale_factor)
         for encode_face , face_location in zip(cf_encoding, cf_loacations):
             face_dis = self.face_distance(encode_face)
             matches = self.compare_faces(encode_face)
