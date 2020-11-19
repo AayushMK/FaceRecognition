@@ -130,7 +130,7 @@ if __name__ == "__main__":
     frc.encodings_known_img(args.known_images)
     print(frc.class_names)
 
-    #check of file type
+    #check file type
     if args.ivpath.endswith(".jpg") or args.ivpath.endswith(".png") or args.ivpath.endswith(".jpeg"):
         frc.show_image(args.ivpath)
     elif args.ivpath.endswith(".mp4"):
