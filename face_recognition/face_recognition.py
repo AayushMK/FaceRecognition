@@ -115,7 +115,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Face Recognitoin")
     parser.add_argument("-i","--ivpath", default="../data/image.jpg", type=str,
                         help="path of image or video to recognize face from.Enter 0 to read from primary camera")
-    parser.add_argument("-s","--shape_predictor", default="../data/shape_predictor_68_face_landmarks.dat",type=str, help="path for shape_predictor_5_face_landmarks.dat file")
+    parser.add_argument("-s","--shape_predictor", default="../data/shape_predictor_68_face_landmarks.dat",type=str, help="path for shape_predictor_68_face_landmarks.dat file")
     parser.add_argument("-m","--model", default="../data/dlib_face_recognition_resnet_model_v1.dat/dlib_face_recognition_resnet_model_v1.dat",type=str, help="path for dlib_face_recognition_resnet_model_v1.dat file")
     parser.add_argument("-ki","--known_images", default="KnownFaces", type=str, help="path of folder containg known images for training/extracting encodings")
     args = parser.parse_args()
