@@ -4,17 +4,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 import argparse
-import face_extraction_dlib as fe
+from face_extraction_dlib import FaceExtractionDlib
 
 
 class FaceRecognition:
     #initialize required parameters
-    def __init__(self, shape_predictor, model):
-        self.shape_predictor = shape_predictor
-        self.detector = dlib.get_frontal_face_detector()
+    def __init__(self, model, fe):
         self.model = model
         self.class_names = []
         self.encoding_known_list = []
+        self.fe = fe
     
     #helper method to find distance between two encodings
     def find_euclidean_distance(self,source_representation, test_representation):
@@ -51,7 +50,7 @@ class FaceRecognition:
         encoding_list = []
         
         for img in images:    
-            img_detect = fe.detect_faces(img, self.detector, self.shape_predictor)
+            img_detect = self.fe.detect_faces(img)
             img_chip = img_detect[0][0]
             img_features = np.array(self.model.compute_face_descriptor(img_chip))
             encoding_list.append(img_features)
@@ -60,13 +59,12 @@ class FaceRecognition:
     #uses all the above functions to get the match and add bounding boxes and names
     def face_recognition(self,img, scale_factor):
         img_small = cv2.resize(img,(0,0),None,scale_factor,scale_factor)
-        img_detect = fe.detect_faces(img_small, self.detector, self.shape_predictor)
+        img_detect = self.fe.detect_faces(img_small)
         left, right, top , bottom = 0,0,0,0
         cf_loacations = img_detect[2]
         cf_encoding =[]
 
         for i in img_detect[0]:
-            print(i.shape)
             img_features = np.array(self.model.compute_face_descriptor(i))
             cf_encoding.append(img_features)
 
@@ -88,9 +86,9 @@ class FaceRecognition:
                 cv2.rectangle(img, (left, bottom), (right, bottom+35), (255,0,0), cv2.FILLED)
                 cv2.putText(img, name,(left+6, bottom+30), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255, 255),2)
         return img
-        
+
     #takes image as input and calls face_recognition method by passing image
-    def show_image(self, path):
+    def show_image(self, path="../data/image.jpg"):
         img = cv2.imread(path)
         img = self.face_recognition(img, 2)
         img= cv2.cvtColor(img,cv2.COLOR_RGB2BGR)
@@ -98,7 +96,7 @@ class FaceRecognition:
         plt.show()
 
     #takes video as input and calls face_recognition method on each frame
-    def show_video(self, video):
+    def show_video(self, video=0):
         cap = cv2.VideoCapture(video)
 
         while True:
@@ -115,41 +113,30 @@ class FaceRecognition:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Face Recognitoin")
-    parser.add_argument("-i","--ivpath", type=str,
+    parser.add_argument("-i","--ivpath", default="../data/image.jpg", type=str,
                         help="path of image or video to recognize face from.Enter 0 to read from primary camera")
-    parser.add_argument("-s","--shape_predictor", type=str, help="path for shape_predictor_5_face_landmarks.dat file")
-    parser.add_argument("-m","--model", type=str, help="path for dlib_face_recognition_resnet_model_v1.dat file")
-    parser.add_argument("-ki","--known_images", type=str, help="path of folder containg known images for training/extracting encodings")
+    parser.add_argument("-s","--shape_predictor", default="../data/shape_predictor_68_face_landmarks.dat",type=str, help="path for shape_predictor_5_face_landmarks.dat file")
+    parser.add_argument("-m","--model", default="../data/dlib_face_recognition_resnet_model_v1.dat/dlib_face_recognition_resnet_model_v1.dat",type=str, help="path for dlib_face_recognition_resnet_model_v1.dat file")
+    parser.add_argument("-ki","--known_images", default="KnownFaces", type=str, help="path of folder containg known images for training/extracting encodings")
     args = parser.parse_args()
 
     
-    if(args.shape_predictor == None):
-        shape_predictor = dlib.shape_predictor("../data/shape_predictor_68_face_landmarks.dat")
-    else:
-        shape_predictor = dlib.shape_predictor(args.shape_predictor)
-    if(args.model == None):
-        model = dlib.face_recognition_model_v1("../data/dlib_face_recognition_resnet_model_v1.dat/dlib_face_recognition_resnet_model_v1.dat")
-    else:
-        model = dlib.face_recognition_model_v1(args.model)
+
+    model = dlib.face_recognition_model_v1(args.model)
     
     #Get FaceRecognition object
-    frc = FaceRecognition( shape_predictor, model)
-
-    if(args.known_images == None):
-        frc.encodings_known_img()
-    else:
-        frc.encodings_known_img(args.known_images)
+    fe = FaceExtractionDlib(args.shape_predictor)
+    frc = FaceRecognition( model, fe)
+    frc.encodings_known_img(args.known_images)
     print(frc.class_names)
 
-    if(args.ivpath == None):
-        print("File path not specified see help using -h")
+    #check of file type
+    if args.ivpath.endswith(".jpg") or args.ivpath.endswith(".png") or args.ivpath.endswith(".jpeg"):
+        frc.show_image(args.ivpath)
+    elif args.ivpath.endswith(".mp4"):
+        frc.show_video(args.ivpath)
+    elif args.ivpath == '0':
+        frc.show_video(0)
     else:
-        if args.ivpath.endswith(".jpg") or args.ivpath.endswith(".png") or args.ivpath.endswith(".jpeg"):
-            frc.show_image(args.ivpath)
-        elif args.ivpath.endswith(".mp4"):
-            frc.show_video(args.ivpath)
-        elif args.ivpath == '0':
-            frc.show_video(0)
-        else:
-            print("File format not supported")
+        print("File format not supported")
     
