@@ -1,15 +1,10 @@
 from sklearn.datasets import fetch_lfw_pairs
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
-import pandas as pd
-from PIL import Image
 import numpy as np
-
 from keras_vggface.utils import preprocess_input
 from keras_vggface.vggface import VGGFace
-from mtcnn.mtcnn import MTCNN
 from scipy.spatial.distance import cosine
 from numpy import asarray
-from PIL import Image
 from matplotlib import pyplot
 import cv2
 
