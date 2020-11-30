@@ -17,7 +17,6 @@ class evluate_model():
     def __init__(self):
         self.flp = fetch_lfw_pairs(subset='test', color=True, resize=1  # this transform inputs to (125, 94) from (62, 47)
                                         )
-
 #helper fucntion to get embeddings of list of images
     def get_embeddings(self, samples):
 
@@ -46,7 +45,7 @@ class evluate_model():
 #makes images ready for evaluation
     def preprocess_data(self):
         pairs = self.flp.pairs
-        instances = pairs.shape[0]
+        instances = pairs[0]
         pairs_first_column = pairs[:, 0]
         pairs_second_column = pairs[:, 1]
         all_faces = []
@@ -69,17 +68,18 @@ class evluate_model():
         print("embedding started")
         embeddings = self.get_embeddings(all_faces)
         print("embedding finished")
-
+        
         embeddings_first = embeddings[0:1000]
         embeddings_second = embeddings[1000:2000]
 
         labels = self.flp.target
         target_names = self.flp.target_names
-
+        pairs = self.flp.pairs
+        instances = pairs[0]
         for i in range(1000):
             face = []
             pair = pairs[i]
-            obj = is_match(self, embeddings_first[i], embeddings_second[i], thresh=0.5)
+            obj = self.is_match(embeddings_first[i], embeddings_second[i], thresh=0.5)
             prediction = obj["verified"]
             predictions.append(prediction)
 
